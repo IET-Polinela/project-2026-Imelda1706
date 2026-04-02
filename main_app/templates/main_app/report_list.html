@@ -1,18 +1,16 @@
-<h1>Selamat Datang di kota raccoon </h1>
-
-<p>website laporan masalah kota</p>
+<h1>Daftar Laporan</h1>
 
 <a href="/add/">Tambah Laporan</a>
+<a href="/">Home</a> |
+<a href="/about/">About</a> |
+<a href="/contacts/">Contact</a>
 
 <hr>
 
-<h2>Daftar Laporan</h2>
-
 {% for report in reports %}
     <div style="border:1px solid black; padding:10px; margin-bottom:10px;">
+        
         <p><b>Judul:</b> {{ report.title }}</p>
-        <p><b>Kategori:</b> {{ report.category }}</p>
-        <p><b>Deskripsi:</b> {{ report.description }}</p>
         <p><b>Lokasi:</b> {{ report.location }}</p>
         <p><b>Status:</b> {{ report.status }}</p>
 
@@ -24,5 +22,6 @@
         {% else %}
             <span> Sudah Diverifikasi</span>
         {% endif %}
+
     </div>
 {% endfor %}
