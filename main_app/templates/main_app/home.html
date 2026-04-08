@@ -9,15 +9,14 @@
 <h2>Daftar Laporan</h2>
 
 {% for report in reports %}
-    <div style="border:1px solid black; padding:10px; margin-bottom:10px;">
+    <div style="border:1px solid rgb(102, 21, 21); padding:10px; margin-bottom:10px;">
         <p><b>Judul:</b> {{ report.title }}</p>
-        <p><b>Kategori:</b> {{ report.category }}</p>
         <p><b>Deskripsi:</b> {{ report.description }}</p>
         <p><b>Lokasi:</b> {{ report.location }}</p>
         <p><b>Status:</b> {{ report.status }}</p>
 
         <a href="/update/{{ report.id }}">Edit</a> |
-        <a href="/delete/{{ report.id }}">Hapus</a> |
+        <a href="{% url 'delete_report' report.pk %}">Hapus</a>
 
         {% if report.status == "REPORTED" %}
             <a href="/verify/{{ report.id }}"> Verifikasi</a>

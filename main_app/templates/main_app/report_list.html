@@ -1,3 +1,5 @@
+<h1>Selamat Datang di Kota Raccoon</h1>
+<p>Website laporan masalah kota</p>
 <h1>Daftar Laporan</h1>
 
 <a href="/add/">Tambah Laporan</a>
@@ -13,15 +15,44 @@
         <p><b>Judul:</b> {{ report.title }}</p>
         <p><b>Lokasi:</b> {{ report.location }}</p>
         <p><b>Status:</b> {{ report.status }}</p>
+        <p><b>Deskripsi:</b> {{ report.description }}</p>
 
         <a href="/update/{{ report.id }}">Edit</a> |
-        <a href="/delete/{{ report.id }}">Hapus</a> |
+        <a href="{% url 'delete_report' report.pk %}">Hapus</a> |
 
         {% if report.status == "REPORTED" %}
-            <a href="/verify/{{ report.id }}"> Verifikasi</a>
+        <span>Belum Diverifikasi</span>
+
+        {% elif report.status == "VERIFIED" %}
+        <span>Sudah Diverifikasi</span>
+
+        {% elif report.status == "IN PROGRESS" %}
+        <span>Sedang Diproses</span>
+
+        {% elif report.status == "RESOLVED" %}
+        <span>Selesai</span>
+
         {% else %}
             <span> Sudah Diverifikasi</span>
         {% endif %}
 
-    </div>
+    <p>
+        {{ report.title }} - {{ report.status }}
+
+        <a href="{% url 'report_detail' report.pk %}">Detail</a>
+        <a href="/update/{{ report.id }}">Edit</a>
+        <a href="{% url 'delete_report' report.pk %}">Hapus</a>
+
+        <!-- WORKFLOW -->
+        <form action="/update-status/{{ report.id }}/" method="POST">
+            {% csrf_token %}
+            <select name="status">
+                <option value="REPORTED">Reported</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="IN PROGRESS">In Progress</option>
+                <option value="RESOLVED">Resolved</option>
+            </select>
+            <button type="submit">Ubah Status</button>
+        </form>
+    </p>
 {% endfor %}
