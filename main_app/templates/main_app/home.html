@@ -1,27 +1,24 @@
-<h1>Selamat Datang di kota raccoon </h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<p>website laporan masalah kota</p>
+<div class="text-center mt-5">
+    <h1 class="fw-bold" style="color:#6b5e53;">
+        Selamat Datang di Raccoon City
+    </h1>
 
-<a href="/add/">Tambah Laporan</a>
+    <p class="text-muted">
+        Laporkan masalah kotamu dengan mudah dan cepat
+    </p>
 
-<hr>
+    <div class="mt-4">
+        <a href="/reports/" class="btn btn-primary btn-lg me-2">
+            Lihat Laporan
+        </a>
 
-<h2>Daftar Laporan</h2>
-
-{% for report in reports %}
-    <div style="border:1px solid rgb(102, 21, 21); padding:10px; margin-bottom:10px;">
-        <p><b>Judul:</b> {{ report.title }}</p>
-        <p><b>Deskripsi:</b> {{ report.description }}</p>
-        <p><b>Lokasi:</b> {{ report.location }}</p>
-        <p><b>Status:</b> {{ report.status }}</p>
-
-        <a href="/update/{{ report.id }}">Edit</a> |
-        <a href="{% url 'delete_report' report.pk %}">Hapus</a>
-
-        {% if report.status == "REPORTED" %}
-            <a href="/verify/{{ report.id }}"> Verifikasi</a>
-        {% else %}
-            <span> Sudah Diverifikasi</span>
-        {% endif %}
+        <a href="/add/" class="btn btn-success btn-lg">
+            + Tambah Laporan
+        </a>
     </div>
-{% endfor %}
+</div>
+
+{% endblock %}

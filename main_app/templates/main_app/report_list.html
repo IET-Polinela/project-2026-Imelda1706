@@ -1,58 +1,194 @@
-<h1>Selamat Datang di Kota Raccoon</h1>
-<p>Website laporan masalah kota</p>
-<h1>Daftar Laporan</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<a href="/add/">Tambah Laporan</a>
-<a href="/">Home</a> |
-<a href="/about/">About</a> |
-<a href="/contacts/">Contact</a>
+<!-- BREADCRUMB -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb" style="background-color:#e6dfd5; padding:10px; border-radius:10px;">
+    <li class="breadcrumb-item">
+        <a href="/" style="color:#6b5e53; text-decoration:none;">Home</a>
+    </li>
+    <li class="breadcrumb-item active" style="color:#8b6f47;">
+        Reports
+    </li>
+  </ol>
+</nav>
 
-<hr>
+<h2 class="mb-4 text-center" style="color:#6b5e53;">Daftar Laporan</h2>
 
-{% for report in reports %}
-    <div style="border:1px solid black; padding:10px; margin-bottom:10px;">
-        
-        <p><b>Judul:</b> {{ report.title }}</p>
-        <p><b>Lokasi:</b> {{ report.location }}</p>
-        <p><b>Status:</b> {{ report.status }}</p>
-        <p><b>Deskripsi:</b> {{ report.description }}</p>
 
-        <a href="/update/{{ report.id }}">Edit</a> |
-        <a href="{% url 'delete_report' report.pk %}">Hapus</a> |
+{% if reports %}
 
-        {% if report.status == "REPORTED" %}
-        <span>Belum Diverifikasi</span>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <a href="{% url 'add_report' %}" class="btn btn-primary">
+        + Tambah Laporan
+    </a>
+</div>
 
-        {% elif report.status == "VERIFIED" %}
-        <span>Sudah Diverifikasi</span>
+<div class="table-responsive">
 
-        {% elif report.status == "IN PROGRESS" %}
-        <span>Sedang Diproses</span>
+<table class="table table-bordered text-center align-middle custom-table">
+    <thead>
+        <tr>
+            <th>Judul</th>
+            <th>Lokasi</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
 
-        {% elif report.status == "RESOLVED" %}
-        <span>Selesai</span>
+    <tbody>
+    {% for report in reports %}
+        <tr>
 
-        {% else %}
-            <span> Sudah Diverifikasi</span>
-        {% endif %}
+            <td>{{ report.title }}</td>
+            <td>{{ report.location }}</td>
 
-    <p>
-        {{ report.title }} - {{ report.status }}
+            <!-- STATUS -->
+            <td>
+                {% if report.status == "REPORTED" %}
+                    <span class="badge bg-secondary">Reported</span>
+                {% elif report.status == "VERIFIED" %}
+                    <span class="badge bg-primary">Verified</span>
+                {% elif report.status == "IN_PROGRESS" %}
+                    <span class="badge bg-warning text-dark">In Progress</span>
+                {% elif report.status == "RESOLVED" %}
+                    <span class="badge bg-success">Resolved</span>
+                {% endif %}
+            </td>
 
-        <a href="{% url 'report_detail' report.pk %}">Detail</a>
-        <a href="/update/{{ report.id }}">Edit</a>
-        <a href="{% url 'delete_report' report.pk %}">Hapus</a>
+            <!-- AKSI -->
+            <td>
+                <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
 
-        <!-- WORKFLOW -->
-        <form action="/update-status/{{ report.id }}/" method="POST">
+                    <a href="{% url 'report_detail' report.pk %}" class="btn btn-info btn-sm">Detail</a>
+
+                    <a href="{% url 'update_report' report.pk %}" class="btn btn-warning btn-sm">Edit</a>
+
+                    <!-- DELETE -->
+                    <button class="btn btn-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        onclick="setDeleteUrl('{% url 'delete_report' report.pk %}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                    <!-- STATUS -->
+                    {% if report.status == "REPORTED" %}
+                        <button class="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#statusModal"
+                            onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'VERIFIED', 'VERIFIED')">
+                            Verifikasi
+                        </button>
+
+                    {% elif report.status == "VERIFIED" %}
+                        <button class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#statusModal"
+                            onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'IN_PROGRESS', 'IN PROGRESS')">
+                            Proses
+                        </button>
+
+                    {% elif report.status == "IN_PROGRESS" %}
+                        <button class="btn btn-success btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#statusModal"
+                            onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'RESOLVED', 'RESOLVED')">
+                            Selesai
+                        </button>
+
+                    {% elif report.status == "RESOLVED" %}
+                        <span class="badge bg-success">Selesai</span>
+                    {% endif %}
+
+                </div>
+            </td>
+
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div> 
+
+{% else %}
+
+<div class="text-center mt-5">
+    <h4 style="color:#6b5e53;">Belum ada laporan</h4>
+    <a href="{% url 'add_report' %}" class="btn btn-primary">Tambah Laporan</a>
+</div>
+
+{% endif %}
+
+
+<!-- ================= DELETE MODAL ================= -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-danger">Hapus Laporan</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        Yakin ingin menghapus laporan ini?
+      </div>
+
+      <div class="modal-footer border-0 justify-content-center">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+
+        <form id="deleteForm" method="POST">
             {% csrf_token %}
-            <select name="status">
-                <option value="REPORTED">Reported</option>
-                <option value="VERIFIED">Verified</option>
-                <option value="IN PROGRESS">In Progress</option>
-                <option value="RESOLVED">Resolved</option>
-            </select>
-            <button type="submit">Ubah Status</button>
+            <button class="btn btn-danger">Ya, Hapus</button>
         </form>
-    </p>
-{% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ================= STATUS MODAL ================= -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header border-0">
+        <h5 class="modal-title" style="color:#6b5e53;">Update Status</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p>Yakin ingin mengubah status menjadi:</p>
+        <h5 id="statusText" style="color:#8b6f47;"></h5>
+      </div>
+
+      <div class="modal-footer border-0 justify-content-center">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+
+        <form id="statusForm" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="status" id="statusInput">
+            <button class="btn btn-primary">Ya, Ubah</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- SCRIPT -->
+<script>
+function setDeleteUrl(url) {
+    document.getElementById('deleteForm').action = url;
+}
+
+function setStatusUrl(url, status, text) {
+    document.getElementById('statusForm').action = url;
+    document.getElementById('statusInput').value = status;
+    document.getElementById('statusText').innerText = text;
+}
+</script>
+
+{% endblock %}

@@ -1,10 +1,47 @@
-<h1>Detail Laporan</h1>
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- BREADCRUMB -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb" style="background-color:#e6dfd5; padding:10px; border-radius:10px;">
+    <li class="breadcrumb-item">
+        <a href="/" style="color:#6b5e53; text-decoration:none;">Home</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="/reports/" style="color:#6b5e53; text-decoration:none;">Reports</a>
+    </li>
+    <li class="breadcrumb-item active" style="color:#8b6f47;">
+        Detail
+    </li>
+  </ol>
+</nav>
+
+<h2>Detail Laporan</h2>
+
+<div class="card p-3">
 
 <p><b>Judul:</b> {{ object.title }}</p>
 <p><b>Kategori:</b> {{ object.category }}</p>
 <p><b>Deskripsi:</b> {{ object.description }}</p>
 <p><b>Lokasi:</b> {{ object.location }}</p>
-<p><b>Status:</b> {{ object.status }}</p>
-<p><b>Dibuat pada:</b> {{ report.created_at|date:"d F Y, H:i" }} WIB</p>
 
-<a href="/">Kembali</a>
+<!-- STATUS BADGE -->
+<p><b>Status:</b> 
+    {% if object.status == "REPORTED" %}
+        <span class="badge bg-secondary">Reported</span>
+    {% elif object.status == "VERIFIED" %}
+        <span class="badge bg-primary">Verified</span>
+    {% elif object.status == "IN_PROGRESS" %}
+        <span class="badge bg-warning text-dark">In Progress</span>
+    {% elif object.status == "RESOLVED" %}
+        <span class="badge bg-success">Resolved</span>
+    {% endif %}
+</p>
+
+<p><b>Dibuat:</b> {{ object.created_at }}</p>
+
+</div>
+
+<a href="{% url 'report_list' %}" class="btn btn-secondary mt-3">Kembali</a>
+
+{% endblock %}

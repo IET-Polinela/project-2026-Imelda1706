@@ -1,13 +1,40 @@
-<h1>Edit Laporan</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<a href="/">Home</a> |
-<a href="/about/">About</a> |
-<a href="/contacts/">Contact</a>
+<!-- BREADCRUMB -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb" style="background-color:#e6dfd5; padding:10px; border-radius:10px;">
+    <li class="breadcrumb-item">
+        <a href="/" style="color:#6b5e53; text-decoration:none;">Home</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="/reports/" style="color:#6b5e53; text-decoration:none;">Reports</a>
+    </li>
+    <li class="breadcrumb-item active" style="color:#8b6f47;">
+        Edit
+    </li>
+  </ol>
+</nav>
 
-<hr>
+<h2>Edit Laporan</h2>
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
+<form method="POST" onsubmit="handleSubmit(this)">
+{% csrf_token %}
+
+{{ form.as_p }}
+
+<button type="submit" class="btn btn-warning">Update</button>
+<a href="{% url 'report_list' %}" class="btn btn-secondary">Kembali</a>
+
 </form>
+
+<!-- SCRIPT LOADING -->
+<script>
+function handleSubmit(form) {
+    const btn = form.querySelector("button[type='submit']");
+    btn.innerText = "Mengupdate...";
+    btn.disabled = true;
+}
+</script>
+
+{% endblock %}
