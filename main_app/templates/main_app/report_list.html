@@ -18,11 +18,13 @@
 
 {% if reports %}
 
+{% if user.is_authenticated and user.is_admin %}
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <a href="{% url 'add_report' %}" class="btn btn-primary">
         + Tambah Laporan
     </a>
 </div>
+{% endif %}
 
 <div class="table-responsive">
 
@@ -62,6 +64,7 @@
 
                     <a href="{% url 'report_detail' report.pk %}" class="btn btn-info btn-sm">Detail</a>
 
+                    {% if user.is_authenticated and user.is_admin %}
                     <a href="{% url 'update_report' report.pk %}" class="btn btn-warning btn-sm">Edit</a>
 
                     <!-- DELETE -->
@@ -80,7 +83,8 @@
                             onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'VERIFIED', 'VERIFIED')">
                             Verifikasi
                         </button>
-
+            
+                    <!-- STATUS -->
                     {% elif report.status == "VERIFIED" %}
                         <button class="btn btn-warning btn-sm"
                             data-bs-toggle="modal"
@@ -100,6 +104,7 @@
                     {% elif report.status == "RESOLVED" %}
                         <span class="badge bg-success">Selesai</span>
                     {% endif %}
+                    {% endif %}
 
                 </div>
             </td>
@@ -108,13 +113,15 @@
     {% endfor %}
     </tbody>
 </table>
-</div> 
+</div>
 
 {% else %}
 
 <div class="text-center mt-5">
     <h4 style="color:#6b5e53;">Belum ada laporan</h4>
+    {% if user.is_authenticated and user.is_admin %}
     <a href="{% url 'add_report' %}" class="btn btn-primary">Tambah Laporan</a>
+    {% endif %}
 </div>
 
 {% endif %}
@@ -177,8 +184,8 @@
   </div>
 </div>
 
-
 <!-- SCRIPT -->
+
 <script>
 function setDeleteUrl(url) {
     document.getElementById('deleteForm').action = url;

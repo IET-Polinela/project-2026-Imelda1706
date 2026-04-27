@@ -30,9 +30,7 @@
         font-weight: 500;
     }
 
-    .nav-link:hover {
-        color: #8b7d6b !important;
-    }
+    .nav-link:hover { color: #8b7d6b !important; }
 
     .navbar-toggler {
         border: none;
@@ -120,16 +118,11 @@
         transition: 0.25s ease;
     }
 
-    .custom-table td {
-        color: #4e463f;
-    }
+    .badge.bg-secondary { background-color: #e3bcce !important; }
+    .badge.bg-primary { background-color: #a0c4ff !important; }
+    .badge.bg-warning { background-color: #ffe066 !important; color: black; }
+    .badge.bg-success { background-color: #d6d3d1 !important; color: #5f5b57; }
 
-    /* ================= BADGE ================= */
-    .badge.bg-secondary { background-color: #e3bcce !important; } /* reported */
-    .badge.bg-primary { background-color: #a0c4ff !important; } /* verified pastel */
-    .badge.bg-warning { background-color: #ffe066 !important; color: black; } /* progress pastel */
-    .badge.bg-success { background-color: #d6d3d1 !important; color: #5f5b57; } /* resolved abu */
-    /* ================= ALERT ================= */
     .alert-success {
         background-color: #e6dfd5;
         border: none;
@@ -152,10 +145,28 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
+
             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="/reports/">Reports</a></li>
             <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
             <li class="nav-item"><a class="nav-link" href="/contacts/">Contact</a></li>
+
+            <!-- FIX LOGIN / LOGOUT -->
+            {% if user.is_authenticated %}
+            <li class="nav-item d-flex align-items-center">
+                <form action="/logout/" method="POST" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link btn btn-link p-0 m-0">
+                        Logout
+                    </button>
+                </form>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="/login/">Login</a>
+            </li>
+            {% endif %}
+
         </ul>
     </div>
 
@@ -166,7 +177,7 @@
 <div class="container mt-3">
 {% if messages %}
     {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
             {{ message }}
             <button class="btn-close" data-bs-dismiss="alert"></button>
         </div>

@@ -3,7 +3,26 @@ from django.urls import reverse_lazy
 from .models import Report
 from django.views import View
 from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages   # Alert
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+# ======================
+# ADMIN REQUIRED
+# ======================
+class AdminRequiredMixin(LoginRequiredMixin):
+    login_url = 'login'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "Silakan login terlebih dahulu.")
+            return self.handle_no_permission()
+
+        if not request.user.is_admin:
+            messages.error(request, "Akses ditolak. Hanya admin yang dapat melakukan aksi ini.")
+            return redirect('report_list')
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 # ======================
@@ -33,7 +52,7 @@ class ReportDetailView(DetailView):
 # ======================
 # CREATE
 # ======================
-class ReportCreateView(CreateView):
+class ReportCreateView(AdminRequiredMixin, CreateView):
     model = Report
     fields = ['title', 'category', 'description', 'location']
     template_name = 'main_app/add_report.html'
@@ -47,7 +66,7 @@ class ReportCreateView(CreateView):
 # ======================
 # UPDATE
 # ======================
-class ReportUpdateView(UpdateView):
+class ReportUpdateView(AdminRequiredMixin, UpdateView):
     model = Report
     fields = ['title', 'category', 'description', 'location']
     template_name = 'main_app/update_report.html'
@@ -61,7 +80,7 @@ class ReportUpdateView(UpdateView):
 # ======================
 # DELETE
 # ======================
-class ReportDeleteView(DeleteView):
+class ReportDeleteView(AdminRequiredMixin, DeleteView):
     model = Report
     template_name = 'main_app/delete_report.html'
     success_url = reverse_lazy('report_list')
@@ -74,12 +93,11 @@ class ReportDeleteView(DeleteView):
 # ======================
 # UPDATE STATUS
 # ======================
-class ReportUpdateStatusView(View):
+class ReportUpdateStatusView(AdminRequiredMixin, View):
     def post(self, request, pk):
         report = get_object_or_404(Report, pk=pk)
         report.status = request.POST.get('status')
         report.save()
 
-        messages.success(request, "Status laporan berhasil diubah!")  
-
+        messages.success(request, "Status laporan berhasil diubah!")
         return redirect('report_list')
