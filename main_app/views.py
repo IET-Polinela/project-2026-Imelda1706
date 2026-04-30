@@ -5,6 +5,7 @@ from django.views import View
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 
 
 # ======================
@@ -101,3 +102,45 @@ class ReportUpdateStatusView(AdminRequiredMixin, View):
 
         messages.success(request, "Status laporan berhasil diubah!")
         return redirect('report_list')
+
+# =====================
+# Live Search dan Modal 
+# =====================
+class ReportSearchView(View):
+    def get(self, request):
+        keyword = request.GET.get('q', '')
+
+        reports = Report.objects.all().order_by('-created_at')
+
+        if keyword:
+            reports = reports.filter(title__icontains=keyword)
+
+        data = []
+
+        for report in reports:
+            data.append({
+                'id': report.id,
+                'title': report.title,
+                'category': report.category,
+                'location': report.location,
+                'status': report.status,
+            })
+
+        return JsonResponse({'reports': data})
+
+
+class ReportDetailJsonView(View):
+    def get(self, request, pk):
+        report = get_object_or_404(Report, pk=pk)
+
+        data = {
+            'id': report.id,
+            'title': report.title,
+            'category': report.category,
+            'description': report.description,
+            'location': report.location,
+            'status': report.status,
+            'created_at': report.created_at.strftime('%d %B %Y %H:%M'),
+        }
+
+        return JsonResponse(data)

@@ -11,26 +11,70 @@
 
 <style>
     body {
-        background-color: #f5f1ea;
+        background:
+            radial-gradient(circle at top left, rgba(200, 182, 166, 0.35), transparent 35%),
+            radial-gradient(circle at bottom right, rgba(163, 177, 138, 0.18), transparent 30%),
+            #f5f1ea;
         font-family: 'Segoe UI', sans-serif;
+        color: #3e3a37;
     }
 
-    /* ================= NAVBAR ================= */
     .navbar {
-        background-color: #d8cfc4 !important;
+        background: linear-gradient(135deg, #d8cfc4, #c8b6a6) !important;
+        padding: 18px 0;
+        border-radius: 0 0 24px 24px;
+        box-shadow: 0 12px 28px rgba(78, 70, 63, 0.18);
     }
 
     .navbar-brand {
-        font-weight: bold;
+        font-weight: 800;
         color: #4e463f !important;
+        font-size: 24px;
+        letter-spacing: 0.5px;
     }
 
     .nav-link {
         color: #4e463f !important;
-        font-weight: 500;
+        font-weight: 600;
+        margin-left: 12px;
+        padding: 8px 16px !important;
+        border-radius: 20px;
+        transition: all 0.25s ease;
     }
 
-    .nav-link:hover { color: #8b7d6b !important; }
+    .nav-link:hover {
+        background-color: #ffffff;
+        color: #8b6f47 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(78, 70, 63, 0.15);
+    }
+
+    .user-pill {
+        background-color: #ffffff;
+        color: #4e463f;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 20px;
+        margin-left: 12px;
+        box-shadow: 0 4px 10px rgba(78, 70, 63, 0.1);
+    }
+
+    .logout-btn {
+        background-color: #d6a77a;
+        color: white;
+        border: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 20px;
+        margin-left: 12px;
+        transition: all 0.25s ease;
+    }
+
+    .logout-btn:hover {
+        background-color: #c89563;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(78, 70, 63, 0.15);
+    }
 
     .navbar-toggler {
         border: none;
@@ -40,7 +84,16 @@
         filter: invert(30%);
     }
 
-    /* ================= BUTTON ================= */
+    .btn {
+        border-radius: 10px;
+        transition: all 0.25s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(78, 70, 63, 0.14);
+    }
+
     .btn-primary {
         background-color: #c8b6a6;
         border: none;
@@ -49,7 +102,6 @@
 
     .btn-primary:hover {
         background-color: #b7a391;
-        transform: scale(1.05);
     }
 
     .btn-success {
@@ -59,7 +111,6 @@
 
     .btn-success:hover {
         background-color: #8f9e76;
-        transform: scale(1.05);
     }
 
     .btn-danger {
@@ -69,53 +120,48 @@
 
     .btn-danger:hover {
         background-color: #c89563;
-        transform: scale(1.05);
     }
 
-    .btn-warning:hover,
-    .btn-info:hover {
-        transform: scale(1.05);
-    }
-
-    /* ================= CARD ================= */
     .card {
-        border-radius: 15px;
-        background-color: #ffffff;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        border-radius: 22px;
+        background-color: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(216, 207, 196, 0.65);
+        box-shadow: 0 14px 30px rgba(78, 70, 63, 0.10);
+        transition: all 0.25s ease;
     }
 
-    /* ================= TABLE ================= */
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 38px rgba(78, 70, 63, 0.14);
+    }
+
     .custom-table {
         background-color: #ffffff;
-        border-radius: 12px;
+        border-radius: 16px;
         overflow: hidden;
+        box-shadow: 0 12px 25px rgba(78, 70, 63, 0.08);
     }
 
-    /* HEADER COKLAT AESTHETIC */
-    .custom-table thead,
-    .custom-table thead tr,
     .custom-table thead th {
         background: linear-gradient(135deg, #c8b6a6, #b7a391) !important;
         color: #3e3a37 !important;
-    }
-
-    .custom-table th {
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        padding: 12px;
+        font-weight: 700;
+        padding: 14px;
+        letter-spacing: 0.4px;
     }
 
     .custom-table tbody tr:nth-child(even) {
         background-color: #f5f1ea !important;
     }
 
-    .custom-table tbody tr:nth-child(odd) {
-        background-color: #ffffff !important;
-    }
-
     .custom-table tbody tr:hover {
         background-color: #e6dfd5 !important;
         transition: 0.25s ease;
+    }
+
+    .badge {
+        padding: 7px 11px;
+        border-radius: 10px;
     }
 
     .badge.bg-secondary { background-color: #e3bcce !important; }
@@ -127,14 +173,30 @@
         background-color: #e6dfd5;
         border: none;
         color: #4e463f;
+        border-radius: 14px;
+        box-shadow: 0 8px 18px rgba(78, 70, 63, 0.08);
+    }
+
+    .alert-danger,
+    .alert-error {
+        background-color: #f1d4cf;
+        border: none;
+        color: #6a3f39;
+        border-radius: 14px;
+        box-shadow: 0 8px 18px rgba(78, 70, 63, 0.08);
+    }
+
+    input,
+    textarea,
+    select {
+        border-radius: 12px !important;
     }
 </style>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg sticky-top">
 <div class="container">
 
     <a class="navbar-brand" href="/">Raccoon City</a>
@@ -144,21 +206,22 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
 
             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="/reports/">Reports</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dashboard/">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
             <li class="nav-item"><a class="nav-link" href="/contacts/">Contact</a></li>
 
-            <!-- FIX LOGIN / LOGOUT -->
             {% if user.is_authenticated %}
-            <li class="nav-item d-flex align-items-center">
+            <li class="nav-item">
+                <span class="user-pill">{{ user.username }}</span>
+            </li>
+            <li class="nav-item">
                 <form action="/logout/" method="POST" class="m-0">
                     {% csrf_token %}
-                    <button type="submit" class="nav-link btn btn-link p-0 m-0">
-                        Logout
-                    </button>
+                    <button type="submit" class="logout-btn">Logout</button>
                 </form>
             </li>
             {% else %}
@@ -173,7 +236,6 @@
 </div>
 </nav>
 
-<!-- ================= ALERT ================= -->
 <div class="container mt-3">
 {% if messages %}
     {% for message in messages %}
@@ -185,7 +247,6 @@
 {% endif %}
 </div>
 
-<!-- ================= CONTENT ================= -->
 <div class="container mt-4">
 {% block content %}
 {% endblock %}

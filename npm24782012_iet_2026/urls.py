@@ -13,4 +13,5 @@ urlpatterns = [
 
     # usermanagement
     path('', include('usermanagement_24782012.urls')),
+    path('', include('dashboard_24782012.urls')),
 ]

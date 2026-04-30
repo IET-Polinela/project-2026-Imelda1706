@@ -1,190 +1,302 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- BREADCRUMB -->
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb" style="background-color:#e6dfd5; padding:10px; border-radius:10px;">
-    <li class="breadcrumb-item">
-        <a href="/" style="color:#6b5e53; text-decoration:none;">Home</a>
-    </li>
-    <li class="breadcrumb-item active" style="color:#8b6f47;">
-        Reports
-    </li>
-  </ol>
-</nav>
+<div class="report-page">
 
-<h2 class="mb-4 text-center" style="color:#6b5e53;">Daftar Laporan</h2>
+    <!-- HERO REPORT -->
+    <div class="report-hero mb-4">
+        <div>
+            <p class="report-label">Raccoon City Reports</p>
+            <h2>Daftar Laporan Kota</h2>
+            <p class="report-desc">
+                Pantau laporan masyarakat secara cepat, dinamis, dan real-time.
+            </p>
+        </div>
 
+        {% if user.is_authenticated and user.is_admin %}
+        <a href="{% url 'add_report' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tambah Laporan
+        </a>
+        {% endif %}
+    </div>
 
-{% if reports %}
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb report-breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/" style="color:#6b5e53; text-decoration:none;">Home</a>
+        </li>
+        <li class="breadcrumb-item active" style="color:#8b6f47;">
+            Reports
+        </li>
+      </ol>
+    </nav>
 
-{% if user.is_authenticated and user.is_admin %}
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-    <a href="{% url 'add_report' %}" class="btn btn-primary">
-        + Tambah Laporan
-    </a>
+    <!-- CARD UTAMA -->
+    <div class="report-card">
+
+        <!-- SEARCH -->
+        <div class="search-box mb-4">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput"
+                   placeholder="Cari laporan berdasarkan judul...">
+        </div>
+
+        {% if reports %}
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle custom-table">
+                <thead>
+                    <tr>
+                        <th>Judul</th>
+                        <th>Lokasi</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody id="reportTableBody">
+                {% for report in reports %}
+                    <tr>
+                        <td>{{ report.title }}</td>
+                        <td>{{ report.location }}</td>
+                        <td>
+                            {% if report.status == "REPORTED" %}
+                                <span class="badge bg-secondary">Reported</span>
+                            {% elif report.status == "VERIFIED" %}
+                                <span class="badge bg-primary">Verified</span>
+                            {% elif report.status == "IN_PROGRESS" %}
+                                <span class="badge bg-warning text-dark">In Progress</span>
+                            {% elif report.status == "RESOLVED" %}
+                                <span class="badge bg-success">Resolved</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
+
+                                <button class="btn btn-info btn-sm detail-btn" data-id="{{ report.pk }}">
+                                    Detail
+                                </button>
+
+                                {% if user.is_authenticated and user.is_admin %}
+                                <a href="{% url 'update_report' report.pk %}" class="btn btn-warning btn-sm">Edit</a>
+
+                                <button class="btn btn-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    onclick="setDeleteUrl('{% url 'delete_report' report.pk %}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                {% if report.status == "REPORTED" %}
+                                    <button class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#statusModal"
+                                        onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'VERIFIED', 'VERIFIED')">
+                                        Verifikasi
+                                    </button>
+                                {% elif report.status == "VERIFIED" %}
+                                    <button class="btn btn-warning btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#statusModal"
+                                        onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'IN_PROGRESS', 'IN PROGRESS')">
+                                        Proses
+                                    </button>
+                                {% elif report.status == "IN_PROGRESS" %}
+                                    <button class="btn btn-success btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#statusModal"
+                                        onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'RESOLVED', 'RESOLVED')">
+                                        Selesai
+                                    </button>
+                                {% elif report.status == "RESOLVED" %}
+                                    <span class="badge bg-success">Selesai</span>
+                                {% endif %}
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center mt-5">
+            <h4 style="color:#6b5e53;">Belum ada laporan</h4>
+            {% if user.is_authenticated and user.is_admin %}
+            <a href="{% url 'add_report' %}" class="btn btn-primary">Tambah Laporan</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
 
-<div class="table-responsive">
-
-<table class="table table-bordered text-center align-middle custom-table">
-    <thead>
-        <tr>
-            <th>Judul</th>
-            <th>Lokasi</th>
-            <th>Status</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-
-    <tbody>
-    {% for report in reports %}
-        <tr>
-
-            <td>{{ report.title }}</td>
-            <td>{{ report.location }}</td>
-
-            <!-- STATUS -->
-            <td>
-                {% if report.status == "REPORTED" %}
-                    <span class="badge bg-secondary">Reported</span>
-                {% elif report.status == "VERIFIED" %}
-                    <span class="badge bg-primary">Verified</span>
-                {% elif report.status == "IN_PROGRESS" %}
-                    <span class="badge bg-warning text-dark">In Progress</span>
-                {% elif report.status == "RESOLVED" %}
-                    <span class="badge bg-success">Resolved</span>
-                {% endif %}
-            </td>
-
-            <!-- AKSI -->
-            <td>
-                <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
-
-                    <a href="{% url 'report_detail' report.pk %}" class="btn btn-info btn-sm">Detail</a>
-
-                    {% if user.is_authenticated and user.is_admin %}
-                    <a href="{% url 'update_report' report.pk %}" class="btn btn-warning btn-sm">Edit</a>
-
-                    <!-- DELETE -->
-                    <button class="btn btn-danger btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#deleteModal"
-                        onclick="setDeleteUrl('{% url 'delete_report' report.pk %}')">
-                        <i class="bi bi-trash"></i>
-                    </button>
-
-                    <!-- STATUS -->
-                    {% if report.status == "REPORTED" %}
-                        <button class="btn btn-primary btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#statusModal"
-                            onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'VERIFIED', 'VERIFIED')">
-                            Verifikasi
-                        </button>
-            
-                    <!-- STATUS -->
-                    {% elif report.status == "VERIFIED" %}
-                        <button class="btn btn-warning btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#statusModal"
-                            onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'IN_PROGRESS', 'IN PROGRESS')">
-                            Proses
-                        </button>
-
-                    {% elif report.status == "IN_PROGRESS" %}
-                        <button class="btn btn-success btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#statusModal"
-                            onclick="setStatusUrl('{% url 'update_status' report.pk %}', 'RESOLVED', 'RESOLVED')">
-                            Selesai
-                        </button>
-
-                    {% elif report.status == "RESOLVED" %}
-                        <span class="badge bg-success">Selesai</span>
-                    {% endif %}
-                    {% endif %}
-
-                </div>
-            </td>
-
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<!-- DETAIL MODAL -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" style="color:#6b5e53;">Detail Laporan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Judul:</strong> <span id="detailTitle"></span></p>
+        <p><strong>Kategori:</strong> <span id="detailCategory"></span></p>
+        <p><strong>Lokasi:</strong> <span id="detailLocation"></span></p>
+        <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+        <p><strong>Deskripsi:</strong></p>
+        <p id="detailDescription"></p>
+        <p><strong>Dibuat:</strong> <span id="detailCreatedAt"></span></p>
+      </div>
+    </div>
+  </div>
 </div>
 
-{% else %}
-
-<div class="text-center mt-5">
-    <h4 style="color:#6b5e53;">Belum ada laporan</h4>
-    {% if user.is_authenticated and user.is_admin %}
-    <a href="{% url 'add_report' %}" class="btn btn-primary">Tambah Laporan</a>
-    {% endif %}
-</div>
-
-{% endif %}
-
-
-<!-- ================= DELETE MODAL ================= -->
+<!-- DELETE MODAL -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 shadow">
-
       <div class="modal-header border-0">
         <h5 class="modal-title text-danger">Hapus Laporan</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <div class="modal-body text-center">
-        Yakin ingin menghapus laporan ini?
-      </div>
-
+      <div class="modal-body text-center">Yakin ingin menghapus laporan ini?</div>
       <div class="modal-footer border-0 justify-content-center">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <form id="deleteForm" method="POST">
             {% csrf_token %}
             <button class="btn btn-danger">Ya, Hapus</button>
         </form>
       </div>
-
     </div>
   </div>
 </div>
 
-
-<!-- ================= STATUS MODAL ================= -->
+<!-- STATUS MODAL -->
 <div class="modal fade" id="statusModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 shadow">
-
       <div class="modal-header border-0">
         <h5 class="modal-title" style="color:#6b5e53;">Update Status</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body text-center">
         <p>Yakin ingin mengubah status menjadi:</p>
         <h5 id="statusText" style="color:#8b6f47;"></h5>
       </div>
-
       <div class="modal-footer border-0 justify-content-center">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <form id="statusForm" method="POST">
             {% csrf_token %}
             <input type="hidden" name="status" id="statusInput">
             <button class="btn btn-primary">Ya, Ubah</button>
         </form>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- SCRIPT -->
+<style>
+.report-page {
+    padding-bottom: 40px;
+}
+
+.report-hero {
+    background: rgba(255,255,255,0.78);
+    border-radius: 28px;
+    padding: 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 18px 38px rgba(78,70,63,0.10);
+}
+
+.report-label {
+    color: #8b6f47;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.report-hero h2 {
+    color: #4e463f;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.report-desc {
+    color: #6b5e53;
+    margin: 0;
+}
+
+.report-breadcrumb {
+    background: rgba(230,223,213,0.85);
+    padding: 12px 16px;
+    border-radius: 16px;
+}
+
+.report-card {
+    background: rgba(255,255,255,0.82);
+    border-radius: 28px;
+    padding: 28px;
+    box-shadow: 0 18px 40px rgba(78,70,63,0.10);
+}
+
+.search-box {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 10px 22px rgba(78,70,63,0.08);
+}
+
+.search-box i {
+    color: #8b6f47;
+    font-size: 20px;
+    margin-right: 12px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #4e463f;
+    font-size: 16px;
+}
+
+.search-box input:focus {
+    box-shadow: none;
+}
+
+.custom-table {
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.custom-table tbody tr {
+    transition: 0.2s ease;
+}
+
+.custom-table tbody tr:hover {
+    transform: scale(1.005);
+}
+
+@media (max-width: 768px) {
+    .report-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        padding: 25px;
+    }
+
+    .report-card {
+        padding: 18px;
+    }
+}
+</style>
 
 <script>
 function setDeleteUrl(url) {
@@ -196,6 +308,91 @@ function setStatusUrl(url, status, text) {
     document.getElementById('statusInput').value = status;
     document.getElementById('statusText').innerText = text;
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const reportTableBody = document.getElementById('reportTableBody');
+    const detailModalElement = document.getElementById('detailModal');
+
+    let searchTimer = null;
+
+    function getStatusBadge(status) {
+        if (status === 'REPORTED') return '<span class="badge bg-secondary">Reported</span>';
+        if (status === 'VERIFIED') return '<span class="badge bg-primary">Verified</span>';
+        if (status === 'IN_PROGRESS') return '<span class="badge bg-warning text-dark">In Progress</span>';
+        if (status === 'RESOLVED') return '<span class="badge bg-success">Resolved</span>';
+        return status;
+    }
+
+    function loadReports(keyword = '') {
+        fetch(`/reports/search/?q=${encodeURIComponent(keyword)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Data JSON Live Search:", data);
+
+                reportTableBody.innerHTML = '';
+
+                if (data.reports.length === 0) {
+                    reportTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center">Tidak ada laporan yang sesuai.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                data.reports.forEach(report => {
+                    reportTableBody.innerHTML += `
+                        <tr>
+                            <td>${report.title}</td>
+                            <td>${report.location}</td>
+                            <td>${getStatusBadge(report.status)}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm detail-btn" data-id="${report.id}">
+                                    Detail
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+
+    searchInput.addEventListener('keyup', function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function () {
+            loadReports(searchInput.value);
+        }, 400);
+    });
+
+    if (detailModalElement) {
+        detailModalElement.addEventListener('hidden.bs.modal', function () {
+            if (document.activeElement) document.activeElement.blur();
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('detail-btn')) {
+            const reportId = event.target.getAttribute('data-id');
+
+            fetch(`/reports/detail-json/${reportId}/`)
+                .then(response => response.json())
+                .then(report => {
+                    console.log("Data JSON Detail:", report);
+
+                    document.getElementById('detailTitle').innerText = report.title;
+                    document.getElementById('detailCategory').innerText = report.category;
+                    document.getElementById('detailLocation').innerText = report.location;
+                    document.getElementById('detailDescription').innerText = report.description;
+                    document.getElementById('detailCreatedAt').innerText = report.created_at;
+                    document.getElementById('detailStatus').innerHTML = getStatusBadge(report.status);
+
+                    const modal = bootstrap.Modal.getOrCreateInstance(detailModalElement);
+                    modal.show();
+                });
+        }
+    });
+});
 </script>
 
 {% endblock %}
