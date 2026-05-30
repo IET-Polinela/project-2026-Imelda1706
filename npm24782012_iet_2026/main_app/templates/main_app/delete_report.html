@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0 mx-auto" style="max-width: 500px;">
+    <div class="card-body text-center">
+
+        <h4 class="mb-3 text-danger">
+            <i class="bi bi-exclamation-triangle"></i> Konfirmasi Hapus
+        </h4>
+
+        <p class="mb-4">
+            Apakah kamu yakin ingin menghapus laporan:
+            <br>
+            <strong>"{{ object.title }}"</strong>?
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="bi bi-trash"></i> Ya, Hapus
+            </button>
+
+            <a href="{% url 'report_list' %}" class="btn btn-secondary">
+                Batal
+            </a>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

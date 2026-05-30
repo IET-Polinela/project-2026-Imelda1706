@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<nav class="mb-3">
+  <div style="background:#e6dfd5; padding:10px; border-radius:10px;">
+    <a href="/" style="color:#6b5e53; text-decoration:none;">Home</a> /
+    <span style="color:#8b6f47;">Register</span>
+  </div>
+</nav>
+
+<h2 class="mb-4 text-center" style="color:#6b5e53;">Registrasi</h2>
+
+<div class="card p-4 shadow-sm" style="max-width:500px; margin:auto;">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-primary w-100">Daftar</button>
+    </form>
+
+    <p class="mt-3 text-center">
+        Sudah punya akun?
+        <a href="{% url 'login' %}">Login</a>
+    </p>
+</div>
+
+{% endblock %}
