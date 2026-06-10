@@ -41,6 +41,10 @@ class ReportListView(ListView):
     template_name = 'main_app/report_list.html'
     context_object_name = 'reports'
 
+    def get_queryset(self):
+        return Report.objects.exclude(
+            status='DRAFT'
+        ).order_by('-created_at')
 
 # ======================
 # DETAIL

@@ -514,12 +514,16 @@ function renderMyReports(reports) {
         ${
           report.status === "DRAFT"
           ? `
+
+        <div class="mt-2">
           <button
-            class="btn btn-warning mt-2"
-            onclick="editDraft(${report.id})"
+              class="btn btn-warning btn-sm mt-2"
+              style="width:auto;"
+              onclick="editDraft(${report.id})"
           >
-            Edit Draft
+              Edit Draft
           </button>
+        </div>
           `
           : ""
         }
