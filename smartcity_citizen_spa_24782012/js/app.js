@@ -485,6 +485,11 @@ function renderMyReports(reports) {
         </p>
 
         <p>
+          <strong>Deskripsi:</strong>
+          ${report.description || "-"}
+        </p>
+
+        <p>
           <strong>Status:</strong>
           ${report.status}
         </p>
