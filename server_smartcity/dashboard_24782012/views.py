@@ -1,11 +1,18 @@
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import TemplateView, View
 from django.http import JsonResponse
 from django.db.models import Count
 from main_app.models import Report
 
 
-class DashboardView(TemplateView):
+class DashboardView(UserPassesTestMixin, TemplateView):
     template_name = 'dashboard_24782012/dashboard.html'
+
+    def test_func(self):
+        return (
+            self.request.user.is_authenticated
+            and self.request.user.is_staff
+        )
 
 
 class DashboardDataView(View):

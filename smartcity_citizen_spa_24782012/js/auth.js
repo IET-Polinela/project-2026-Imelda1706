@@ -1,5 +1,5 @@
 function setupLoginForm() {
-    const form = document.getElementById("login-form");
+    const form = document.getElementById("loginForm");
   
     if (!form) return;
   

@@ -10,7 +10,7 @@ const routes = {
           Raccoon City
         </h3>
 
-        <form id="login-form">
+        <form id="loginForm">
 
           <div class="mb-3">
             <label class="form-label">Username</label>
@@ -48,8 +48,9 @@ dashboard: `
       </h5>
 
       <button
-        class="btn btn-success w-100 mb-3"
-        onclick="openCreateModal()">
+      id="btnBukaModal"
+      class="btn btn-success"
+      onclick="openCreateModal()">
 
         <i class="bi bi-plus-circle me-2"></i>
         Buat Laporan Baru
@@ -60,22 +61,53 @@ dashboard: `
 
       <h6>Rekap Status</h6>
 
-      <p>
-        Draft :
-        <span id="draft-count">0</span>
-      </p>
+      <div id="summaryStats">
 
-      <p>
-        Diproses :
-        <span id="progress-count">0</span>
-      </p>
+<p>
+Draft :
+<span
+    id="draft-count"
+    class="badge bg-secondary">
+    0
+</span>
+</p>
 
-      <p>
-        Selesai :
-        <span id="resolved-count">0</span>
-      </p>
+<p>
+Diproses :
+<span
+    id="progress-count"
+    class="badge bg-secondary">
+    0
+</span>
+</p>
 
-    </div>
+<p>
+Selesai :
+<span
+    id="resolved-count"
+    class="badge bg-secondary">
+    0
+</span>
+</p>
+
+</div>
+<hr>
+
+<h6>Status Laporan</h6>
+
+<canvas
+    id="statusChart"
+    height="180">
+</canvas>
+
+<hr>
+
+<h6>Kategori Laporan</h6>
+
+<canvas
+    id="categoryChart"
+    height="180">
+</canvas>
 
   </aside>
 
@@ -94,6 +126,7 @@ dashboard: `
         </button>
 
         <button
+          id="tabFeedKota"
           class="btn btn-outline-secondary"
           onclick="loadDashboardData('feed',1)">
 
@@ -103,14 +136,14 @@ dashboard: `
 
       </div>
 
-      <div id="dashboard-report-list">
+      <div id="listContainer">
 
         Loading...
 
       </div>
 
       <div
-        id="pagination-container"
+        id="paginationContainer"
         class="mt-3 text-center">
 
       </div>
@@ -142,12 +175,12 @@ dashboard: `
 
       </div>
 
-      <div id="report-list">
+      <div id="listContainer">
         Loading...
       </div>
 
       <div
-        id="pagination-container"
+        id="paginationContainer"
         class="mt-3 text-center">
       </div>
 
@@ -173,12 +206,12 @@ dashboard: `
 
       </div>
 
-      <div id="my-report-list">
+      <div id="listContainer">
         Loading...
       </div>
 
       <div
-        id="pagination-container"
+        id="paginationContainer"
         class="mt-3 text-center">
       </div>
 

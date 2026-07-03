@@ -99,7 +99,7 @@
         Raccoon City
       </a>
 
-      <div id="nav-menu" class="ms-auto"></div>
+      <div id="nav-menus" class="ms-auto"></div>
 
     </div>
   </nav>
@@ -131,7 +131,7 @@
 
           <h5
               class="modal-title"
-              id="modalTitle">
+              id="reportModalLabel">
 
               <i class="bi bi-pencil-square"></i>
               Buat Laporan Baru
@@ -158,7 +158,7 @@
 
               <input
                 type="text"
-                id="title"
+                id="inputTitle"
                 class="form-control"
                 required>
 
@@ -170,12 +170,17 @@
                 Kategori
               </label>
 
-              <input
-                type="text"
-                id="category"
-                class="form-control"
-                required>
+              <select
+                  id="category"
+                  class="form-select"
+                  required>
 
+                  <option value="">Pilih kategori</option>
+                  <option value="Infrastruktur">Infrastruktur</option>
+                  <option value="Lingkungan">Lingkungan</option>
+                  <option value="Keamanan">Keamanan</option>
+
+              </select>
             </div>
 
             <div class="mb-3">
@@ -185,7 +190,7 @@
               </label>
 
               <textarea
-                id="description"
+                id="inputDescription"
                 class="form-control"
                 rows="4"
                 required></textarea>
@@ -200,7 +205,7 @@
 
               <input
                 type="text"
-                id="location"
+                id="inputLocation"
                 class="form-control"
                 required>
 
@@ -249,6 +254,9 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Chart JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Project JS -->
   <script src="js/api.js"></script>

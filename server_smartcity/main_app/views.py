@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-
+from django.core.exceptions import PermissionDenied
 
 # ======================
 # ADMIN REQUIRED
@@ -36,7 +36,7 @@ class HomeView(TemplateView):
 # ======================
 # REPORT LIST
 # ======================
-class ReportListView(ListView):
+class ReportListView(AdminRequiredMixin, ListView):
     model = Report
     template_name = 'main_app/report_list.html'
     context_object_name = 'reports'
@@ -49,7 +49,7 @@ class ReportListView(ListView):
 # ======================
 # DETAIL
 # ======================
-class ReportDetailView(DetailView):
+class ReportDetailView(AdminRequiredMixin, DetailView):
     model = Report
     template_name = 'main_app/report_detail.html'
 
@@ -77,6 +77,12 @@ class ReportUpdateView(AdminRequiredMixin, UpdateView):
     template_name = 'main_app/update_report.html'
     success_url = reverse_lazy('report_list')
 
+    def get(self, request, *args, **kwargs):
+        raise PermissionDenied
+
+    def post(self, request, *args, **kwargs):
+        raise PermissionDenied
+
     def form_valid(self, form):
         messages.success(self.request, "Laporan berhasil diperbarui!")
         return super().form_valid(form)
@@ -89,6 +95,12 @@ class ReportDeleteView(AdminRequiredMixin, DeleteView):
     model = Report
     template_name = 'main_app/delete_report.html'
     success_url = reverse_lazy('report_list')
+
+    def get(self, request, *args, **kwargs):
+        raise PermissionDenied
+
+    def post(self, request, *args, **kwargs):
+        raise PermissionDenied
 
     def form_valid(self, form):
         messages.success(self.request, "Laporan berhasil dihapus!")
@@ -112,6 +124,16 @@ class ReportUpdateStatusView(AdminRequiredMixin, View):
 # =====================
 class ReportSearchView(View):
     def get(self, request):
+
+        if (
+            not request.user.is_authenticated
+            or not request.user.is_admin
+        ):
+            return JsonResponse(
+                {"error": "Akses ditolak"},
+                status=403,
+            )
+
         keyword = request.GET.get('q', '')
 
         reports = Report.objects.all().order_by('-created_at')
@@ -148,3 +170,15 @@ class ReportDetailJsonView(View):
         }
 
         return JsonResponse(data)
+    
+def report_detail_api(request, pk):
+        report = get_object_or_404(Report, pk=pk)
+
+        return JsonResponse({
+            'id': report.id,
+            'title': report.title,
+            'category': report.category,
+            'description': report.description,
+            'location': report.location,
+            'status': report.status,
+        })

@@ -1,6 +1,6 @@
 let editingReportId = null;
 function updateNavbar() {
-    const navMenu = document.getElementById("nav-menu");
+    const navMenu = document.getElementById("nav-menus");
     const token = localStorage.getItem("access_token");
   
     if (token) {
@@ -55,6 +55,78 @@ function updateNavbar() {
   document.getElementById(
     "resolved-count"
   ).textContent = resolvedCount;
+}
+
+  let statusChart = null;
+  let categoryChart = null;
+
+function renderDashboardCharts(reports) {
+
+    const statusCanvas = document.getElementById("statusChart");
+    const categoryCanvas = document.getElementById("categoryChart");
+
+    if (!statusCanvas || !categoryCanvas) return;
+
+    const statusData = {
+        DRAFT: 0,
+        REPORTED: 0,
+        VERIFIED: 0,
+        IN_PROGRESS: 0,
+        RESOLVED: 0
+    };
+
+    const categoryData = {};
+
+    reports.forEach(report => {
+
+        statusData[report.status] =
+            (statusData[report.status] || 0) + 1;
+
+        categoryData[report.category] =
+            (categoryData[report.category] || 0) + 1;
+
+    });
+
+    if (statusChart) statusChart.destroy();
+
+    if (categoryChart) categoryChart.destroy();
+
+    statusChart = new Chart(statusCanvas, {
+
+        type: "pie",
+
+        data: {
+
+            labels: Object.keys(statusData),
+
+            datasets: [{
+
+                data: Object.values(statusData)
+
+            }]
+        }
+
+    });
+
+    categoryChart = new Chart(categoryCanvas, {
+
+        type: "bar",
+
+        data: {
+
+            labels: Object.keys(categoryData),
+
+            datasets: [{
+
+                label: "Jumlah",
+
+                data: Object.values(categoryData)
+
+            }]
+        }
+
+    });
+
 }
 
   async function loadReports() {
@@ -242,71 +314,76 @@ async function loadMyReports() {
         progress = 0;
     }
 
-    html += `
-      <div class="card mb-3 p-3">
+html += `
+<div class="col">
+
+    <div class="card mb-3 p-3">
 
         <h5>${report.title}</h5>
 
         <p>
-          <strong>Pelapor:</strong>
-          ${report.reporter || "Warga Anonim"}
+            <strong>Pelapor:</strong>
+            ${report.reporter || "Warga Anonim"}
         </p>
 
         <p>
-          <strong>Kategori:</strong>
-          ${report.category}
+            <strong>Kategori:</strong>
+            ${report.category}
         </p>
 
         <p>
-          <strong>Status:</strong>
-          ${report.status}
+            <strong>Status:</strong>
+            ${report.status}
         </p>
 
         <p>
-          <strong>Progress:</strong> ${progress}%
+            <strong>Progress:</strong>
+            ${progress}%
         </p>
 
         <div style="
-          width:100%;
-          height:20px;
-          background:#ddd;
-          border-radius:10px;
-          overflow:hidden;
-          margin-bottom:15px;
+            width:100%;
+            height:20px;
+            background:#ddd;
+            border-radius:10px;
+            overflow:hidden;
+            margin-bottom:15px;
         ">
 
-          <div style="
-            width:${progress}%;
-            height:100%;
-            background:#198754;
-            color:white;
-            text-align:center;
-            font-size:12px;
-            line-height:20px;
-            font-weight:bold;
-">
-  ${report.status}
-</div>
+            <div style="
+                width:${progress}%;
+                height:100%;
+                background:#198754;
+                color:white;
+                text-align:center;
+                font-size:12px;
+                line-height:20px;
+                font-weight:bold;
+            ">
+                ${report.status}
+            </div>
 
         </div>
 
         <p>
-          <strong>Lokasi:</strong>
-          ${report.location}
+            <strong>Lokasi:</strong>
+            ${report.location}
         </p>
 
         ${
-          report.status === "DRAFT"
-          ? `
-              <button
-                class="btn btn-warning mt-2"
-                onclick="editDraft(${report.id})"
-              >
-                Edit Draft
-              </button>
-  `
-  : ""
-}
+            report.status === "DRAFT"
+            ? `
+                <button
+                    class="btn btn-warning mt-2"
+                    onclick="editDraft(${report.id})">
+                    Edit Draft
+                </button>
+              `
+            : ""
+        }
+
+    </div>
+
 </div>
 `;
   });
@@ -316,38 +393,33 @@ async function loadMyReports() {
 
 async function loadDashboardData(tab, page = 1) {
 
-  const result = await requestAPI(
-    `/report/?tab=${tab}&page=${page}`
-  );
+    const result = await requestAPI(
+        `/report/?tab=${tab}&page=${page}`
+    );
 
-  if (!result.ok) {
-    return;
-  }
+    if (!result.ok) return;
 
-  const reports =
-    result.data.results;
+    const reports = result.data.results;
 
-  if (tab === "my_reports") {
+    if (tab === "my_reports") {
+        renderMyReports(reports);
+    } else {
+        renderFeedReports(reports);
+    }
 
-    renderMyReports(reports);
+    renderPagination(result.data, tab);
 
-  } else {
+    if (tab === "my_reports") {
+        renderDashboardCharts(reports);
+    }
 
-    renderFeedReports(reports);
-
-  }
-
-  renderPagination(
-    result.data,
-    tab
-  );
-}
+} 
 
 function renderFeedReports(reports) {
 
   const container =
     document.getElementById(
-      "dashboard-report-list"
+      "listContainer"
     );
 
   if (!container) return;
@@ -385,6 +457,8 @@ function renderFeedReports(reports) {
     }
 
     html += `
+    <div class="col">
+
       <div class="card mb-3 p-3">
 
         <h5>${report.title}</h5>
@@ -425,6 +499,7 @@ function renderFeedReports(reports) {
           <strong>Lokasi:</strong>
           ${report.location}
         </p>
+            </div>
 
       </div>
     `;
@@ -437,7 +512,7 @@ function renderMyReports(reports) {
 
   const container =
     document.getElementById(
-      "dashboard-report-list"
+      "listContainer"
     );
 
   if (!container) return;
@@ -550,7 +625,20 @@ function renderPagination(
       data.count / 10
     );
 
-  let html = "";
+  console.log("TOTAL DATA :", data.count);
+  console.log("TOTAL PAGE :", totalPages);
+
+  const container =
+    document.getElementById(
+      "paginationContainer"
+    );
+
+  if (!container) return;
+
+  let html = `
+    <nav aria-label="Pagination">
+      <ul class="pagination justify-content-center">
+  `;
 
   for (
     let i = 1;
@@ -559,28 +647,31 @@ function renderPagination(
   ) {
 
     html += `
-      <button
-        class="btn btn-sm btn-outline-secondary me-1"
-        onclick="
-          loadDashboardData(
-            '${tab}',
-            ${i}
-          )
-        "
-      >
-        ${i}
-      </button>
+      <li class="page-item">
+
+        <button
+          class="page-link"
+          onclick="
+            loadDashboardData(
+              '${tab}',
+              ${i}
+            )
+          "
+        >
+          ${i}
+        </button>
+
+      </li>
     `;
+
   }
 
-  let container =
-    document.getElementById(
-      "pagination-container"
-    );
+  html += `
+      </ul>
+    </nav>
+  `;
 
-  if (container) {
-    container.innerHTML = html;
-  }
+  container.innerHTML = html;
 }
 
 async function loadReportForEdit(id) {
@@ -598,17 +689,17 @@ async function loadReportForEdit(id) {
 
   const report = result.data;
 
-  document.getElementById("title").value =
-    report.title || "";
+  document.getElementById("inputTitle").value =
+  report.title || "";
 
   document.getElementById("category").value =
-    report.category || "";
+  report.category || "";
 
-  document.getElementById("description").value =
-    report.description || "";
+  document.getElementById("inputDescription").value =
+  report.description || "";
 
-  document.getElementById("location").value =
-    report.location || "";
+  document.getElementById("inputLocation").value =
+  report.location || "";
 }
 
 async function editDraft(id) {
@@ -628,20 +719,20 @@ async function editDraft(id) {
   const report =
       result.data;
 
-  document.getElementById("title").value =
-      report.title || "";
+  document.getElementById("inputTitle").value =
+    report.title || "";
 
   document.getElementById("category").value =
-      report.category || "";
+    report.category || "";
 
-  document.getElementById("description").value =
-      report.description || "";
+  document.getElementById("inputDescription").value =
+    report.description || "";
 
-  document.getElementById("location").value =
-      report.location || "";
+  document.getElementById("inputLocation").value =
+    report.location || "";
 
   document.getElementById(
-      "modalTitle"
+      "reportModalLabel"
   ).textContent =
       "Edit Draft"; 
 
@@ -669,7 +760,7 @@ function openCreateModal() {
     ).reset();
 
     document.getElementById(
-        "modalTitle"
+        "reportModalLabel"
     ).textContent =
         "Buat Laporan Baru";
 
@@ -721,7 +812,7 @@ window.addEventListener(
                 const payload = {
                     title:
                         document.getElementById(
-                            "title"
+                            "inputTitle"
                         ).value,
 
                     category:
@@ -731,12 +822,12 @@ window.addEventListener(
 
                     description:
                         document.getElementById(
-                            "description"
+                           "inputDescription"
                         ).value,
 
                     location:
                         document.getElementById(
-                            "location"
+                            "inputLocation"
                         ).value,
                     
                     status: "REPORTED"
@@ -810,10 +901,10 @@ window.addEventListener(
     async function () {
 
         const payload = {
-            title: document.getElementById("title").value,
+            title: document.getElementById("inputTitle").value,
             category: document.getElementById("category").value,
-            description: document.getElementById("description").value,
-            location: document.getElementById("location").value,
+            description: document.getElementById("inputDescription").value,
+            location: document.getElementById("inputLocation").value,
             status: "DRAFT"
         };
 

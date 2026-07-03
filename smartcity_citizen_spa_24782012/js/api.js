@@ -21,7 +21,28 @@ async function requestAPI(endpoint, method = "GET", bodyData = null) {
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-  const data = await response.json().catch(() => null);
+
+// =========================
+// JWT Interceptor
+// =========================
+if (response.status === 401) {
+
+    alert("Sesi Anda telah habis atau Anda belum login.");
+
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("username");
+
+    window.location.hash = "#login";
+
+    return {
+        status: 401,
+        ok: false,
+        data: null,
+    };
+}
+
+const data = await response.json().catch(() => null);
 
   return {
     status: response.status,
